@@ -1,0 +1,18 @@
+# Variáveis de ambiente locais
+.env
+
+# Binários gerados pelo Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Arquivos de teste compilados
+*.test
+
+# Cobertura de testes
+*.out
+
+# Pasta do VS Code
+.vscode/
