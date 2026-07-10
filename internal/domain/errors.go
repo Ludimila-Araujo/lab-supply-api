@@ -22,4 +22,15 @@ var (
 	ErrCustomerAddressRequired   = errors.New("customer address is required")
 	ErrCustomerEmailRequired     = errors.New("customer email is required")
 	ErrCustomerPhoneRequired     = errors.New("customer phone is required")
+
+	//OredersItem errors:
+
+	ErrOrderItemProductRequired = errors.New("order item product is required")
+	ErrOrderItemQuantityInvalid = errors.New("order item product must be greater than zero")
+
+	//Orders erros:
+
+	ErrOrderCustomerRequired = errors.New("order customer is required")
+	ErrOrderItemRequired     = errors.New("order item is required")
+	ErrOrderCannotBeModified = errors.New("order cannot be modified")
 )
