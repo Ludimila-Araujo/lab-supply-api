@@ -33,4 +33,7 @@ var (
 	ErrOrderCustomerRequired = errors.New("order customer is required")
 	ErrOrderItemRequired     = errors.New("order item is required")
 	ErrOrderCannotBeModified = errors.New("order cannot be modified")
+
+	//Stock
+	ErrProductInsufficientStock = errors.New("insufficient product stock")
 )
