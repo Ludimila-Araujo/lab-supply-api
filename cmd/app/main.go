@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Ludimila-Araujo/lab-supply-api/internal/config"
+	"github.com/Ludimila-Araujo/lab-supply-api/internal/database"
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/domain"
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/repository"
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/service"
@@ -81,4 +83,25 @@ func main() {
 	fmt.Printf("Quantidade comprada: %d\n", order.Items[0].Quantity)
 	fmt.Printf("Valor total: R$ %.2f\n", order.Total())
 	fmt.Printf("Estoque restante: %d\n", product.Stock)
+
+	//conexão com BD:
+
+	cfg := &config.Config{
+		DBHost:     "localhost",
+		DBPort:     "5433",
+		DBUser:     "postgres",
+		DBPassword: "password",
+		DBName:     "labsupply",
+		DBSSLMode:  "disable",
+	}
+
+	db, err := database.NewConnection(cfg)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	fmt.Println("✅ Connected to PostgreSQL!")
+
 }

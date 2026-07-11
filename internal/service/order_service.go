@@ -25,6 +25,8 @@ func NewOrderService(
 	}
 }
 
+// CreateOrder cria um novo pedido para um cliente.
+
 func (s *OrderService) CreateOrder(
 	customer *domain.Customer,
 	items []CreateOrderItemRequest,
