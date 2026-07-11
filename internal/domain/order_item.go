@@ -11,7 +11,6 @@ type OrderItem struct {
 func NewOrderItem(
 	product *Product,
 	quantity int,
-	unitPrice float64,
 ) (*OrderItem, error) {
 
 	if product == nil {

@@ -5,7 +5,7 @@ import (
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/repository"
 )
 
-//OOrderService coordena os casos de uso relacionados aos pedidos.
+//OrderService coordena os casos de uso relacionados aos pedidos.
 
 type OrderService struct {
 	productRepository repository.ProductRepository
@@ -27,7 +27,7 @@ func NewOrderService(
 
 func (s *OrderService) CreateOrder(
 	customer *domain.Customer,
-	items []*domain.OrderItem,
+	items []CreateOrderItemRequest,
 ) (*domain.Order, error) {
 
 	order, err := domain.NewOrder(customer)
@@ -41,7 +41,16 @@ func (s *OrderService) CreateOrder(
 			return nil, domain.ErrProductInsufficientStock
 		}
 
-		if err := order.AddItem(item); err != nil {
+		orderItem, err := domain.NewOrderItem(
+			item.Product,
+			item.Quantity,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if err := order.AddItem(orderItem); err != nil {
 			return nil, err
 		}
 
