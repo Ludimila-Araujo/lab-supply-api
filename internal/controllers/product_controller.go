@@ -2,11 +2,14 @@ package controllers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/controllers/dto"
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/domain"
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/service"
+
+	"github.com/google/uuid"
 )
 
 //struct:
@@ -66,4 +69,44 @@ func (c *ProductController) Create(
 	w.WriteHeader(http.StatusCreated)
 
 	json.NewEncoder(w).Encode(product)
+}
+
+func (c *ProductController) FindAll(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+
+	log.Println(">>> GET /products chamado")
+
+	products, err := c.productService.FindAll()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(products)
+}
+
+func (c *ProductController) FindByID(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	idString := r.PathValue("id")
+
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		http.Error(w, "invalid product id", http.StatusBadRequest)
+		return
+	}
+
+	product, err := c.productService.FindByID(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(product)
+
 }

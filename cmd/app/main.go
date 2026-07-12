@@ -17,8 +17,6 @@ func main() {
 	// Configuração do banco
 	cfg := config.Load()
 
-	log.Printf("%+v\n", cfg)
-
 	// Conexão
 	db, err := database.NewConnection(cfg)
 	if err != nil {

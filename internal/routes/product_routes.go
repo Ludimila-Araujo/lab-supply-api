@@ -11,8 +11,9 @@ func RegisterProductRoutes(
 	controller *controllers.ProductController,
 ) {
 
-	mux.HandleFunc(
-		"POST /products",
-		controller.Create,
-	)
+	mux.HandleFunc("POST /products", controller.Create)
+
+	mux.HandleFunc("GET /products", controller.FindAll)
+
+	mux.HandleFunc("GET /products/{id}", controller.FindByID)
 }
