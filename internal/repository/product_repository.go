@@ -14,3 +14,11 @@ type ProductRepository interface {
 	Update(product *domain.Product) error
 	Delete(id uuid.UUID) error
 }
+
+type CustomerRepository interface {
+	Create(*domain.Customer) error
+	FindByID(uuid.UUID) (*domain.Customer, error)
+	FindAll() ([]*domain.Customer, error)
+	Update(*domain.Customer) error
+	Delete(uuid.UUID) error
+}

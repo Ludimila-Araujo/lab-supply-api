@@ -1,7 +1,7 @@
 CREATE TABLE
 IF NOT EXISTS customers
 (
-    id UUID PRIMARY KEY.
+    id UUID PRIMARY KEY,
     name VARCHAR
 (255) NOT NULL,
     cpf CHAR
@@ -9,11 +9,11 @@ IF NOT EXISTS customers
     birth_date DATE NOT NULL,
     address TEXT NOT NULL,
     email VARCHAR
-(255),
+(255) UNIQUE NOT NULL,
     phone VARCHAR
 (20) NOT NULL,
     password_hash VARCHAR
 (255) NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
 );

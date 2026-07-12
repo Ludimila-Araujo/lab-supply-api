@@ -24,6 +24,8 @@ func main() {
 	}
 	defer db.Close()
 
+	//Para produtos:
+
 	// Repositório PostgreSQL
 	productRepository := repository.NewPostgresProductRepository(db)
 
@@ -33,6 +35,17 @@ func main() {
 	//Controller:
 	productController := controllers.NewProductController(productService)
 
+	//para clientes:
+
+	// Repositório
+	customerRepository := repository.NewPostgresCustomerRepository(db)
+
+	// Service
+	customerService := service.NewCustomerService(customerRepository)
+
+	// Controller
+	customerController := controllers.NewCustomerController(customerService)
+
 	//Server:
 
 	srv := server.NewServer()
@@ -41,6 +54,11 @@ func main() {
 	routes.RegisterProductRoutes(
 		srv.Mux(),
 		productController,
+	)
+
+	routes.RegisterCustomerRoutes(
+		srv.Mux(),
+		customerController,
 	)
 
 	log.Println("🚀 Lab Supply API running on :8080")

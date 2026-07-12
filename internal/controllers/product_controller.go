@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/controllers/dto"
@@ -75,8 +74,6 @@ func (c *ProductController) FindAll(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-
-	log.Println(">>> GET /products chamado")
 
 	products, err := c.productService.FindAll()
 	if err != nil {
