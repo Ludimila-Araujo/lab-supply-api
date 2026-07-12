@@ -5,19 +5,20 @@ import (
 )
 
 type Server struct {
-	httpServer *http.Server
+	mux *http.ServeMux
 }
 
-func NewServer(addr string, handler http.Handler) *Server {
+func NewServer() *Server {
 
 	return &Server{
-		httpServer: &http.Server{
-			Addr:    addr,
-			Handler: handler,
-		},
+		mux: http.NewServeMux(),
 	}
 }
 
+func (s *Server) Mux() *http.ServeMux {
+	return s.mux
+}
+
 func (s *Server) Start() error {
-	return s.httpServer.ListenAndServe()
+	return http.ListenAndServe(":8080", s.mux)
 }
