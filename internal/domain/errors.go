@@ -12,16 +12,17 @@ var (
 	ErrProductStockRequired       = errors.New("product stock is required, cannot be negative")
 
 	//Customer errors
-	ErrCustomerNameRequired      = errors.New("customer name is required")
-	ErrCustomerCpfRequired       = errors.New("customer cpf is required")
-	ErrCustomerCpfInvalid        = errors.New("customer cpf must contain 11 digits")
-	ErrCustomerBirthDateRequired = errors.New("customer birthdate is required")
-	ErrCustomerBirthDateInvalid  = errors.New("customer birth date is invalid")
-	ErrCustomerUnderAge          = errors.New("customer must be at least 18 years old")
-	ErrCustomerOverAge           = errors.New("customer must be no more than 120 years old")
-	ErrCustomerAddressRequired   = errors.New("customer address is required")
-	ErrCustomerEmailRequired     = errors.New("customer email is required")
-	ErrCustomerPhoneRequired     = errors.New("customer phone is required")
+	ErrCustomerNameRequired         = errors.New("customer name is required")
+	ErrCustomerCpfRequired          = errors.New("customer cpf is required")
+	ErrCustomerCpfInvalid           = errors.New("customer cpf must contain 11 digits")
+	ErrCustomerBirthDateRequired    = errors.New("customer birthdate is required")
+	ErrCustomerBirthDateInvalid     = errors.New("customer birth date is invalid")
+	ErrCustomerUnderAge             = errors.New("customer must be at least 18 years old")
+	ErrCustomerOverAge              = errors.New("customer must be no more than 120 years old")
+	ErrCustomerAddressRequired      = errors.New("customer address is required")
+	ErrCustomerEmailRequired        = errors.New("customer email is required")
+	ErrCustomerPhoneRequired        = errors.New("customer phone is required")
+	ErrCustomerPasswordHashRequired = errors.New("customer password hash is required")
 
 	//OredersItem errors:
 
@@ -33,6 +34,7 @@ var (
 	ErrOrderCustomerRequired = errors.New("order customer is required")
 	ErrOrderItemRequired     = errors.New("order item is required")
 	ErrOrderCannotBeModified = errors.New("order cannot be modified")
+	ErrOrderInvalidStatus    = errors.New("order payment status invalid")
 
 	//Stock
 	ErrProductInsufficientStock = errors.New("insufficient product stock")

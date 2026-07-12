@@ -12,6 +12,8 @@ IF NOT EXISTS customers
 (255),
     phone VARCHAR
 (20) NOT NULL,
+    password_hash VARCHAR
+(255) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
 );

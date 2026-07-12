@@ -7,18 +7,19 @@ import (
 	"github.com/google/uuid"
 )
 
-//// Customer representa um cliente da distribuidora de materiais laboratoriais.
+// Customer representa um cliente da distribuidora de materiais laboratoriais.
 
 type Customer struct {
-	ID        uuid.UUID
-	Name      string
-	CPF       string
-	BirthDate time.Time
-	Address   string
-	Email     string
-	Phone     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID           uuid.UUID
+	Name         string
+	CPF          string
+	BirthDate    time.Time
+	Address      string
+	Email        string
+	Phone        string
+	PasswordHash string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 func NewCustomer(
@@ -28,6 +29,7 @@ func NewCustomer(
 	address string,
 	email string,
 	phone string,
+	passwordHash string,
 ) (*Customer, error) {
 
 	if strings.TrimSpace(name) == "" {
@@ -46,6 +48,10 @@ func NewCustomer(
 		return nil, ErrCustomerPhoneRequired
 	}
 
+	if strings.TrimSpace(passwordHash) == "" {
+		return nil, ErrCustomerPasswordHashRequired
+	}
+
 	if err := validateCPF(cpf); err != nil {
 		return nil, err
 
@@ -58,14 +64,15 @@ func NewCustomer(
 	now := time.Now()
 
 	return &Customer{
-		ID:        uuid.New(),
-		Name:      name,
-		CPF:       cpf,
-		Address:   address,
-		BirthDate: birthDate,
-		Email:     email,
-		Phone:     phone,
-		CreatedAt: now,
-		UpdatedAt: now,
+		ID:           uuid.New(),
+		Name:         name,
+		CPF:          cpf,
+		Address:      address,
+		BirthDate:    birthDate,
+		Email:        email,
+		Phone:        phone,
+		PasswordHash: passwordHash,
+		CreatedAt:    now,
+		UpdatedAt:    now,
 	}, nil
 }
