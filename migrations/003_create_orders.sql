@@ -13,5 +13,4 @@ IF NOT EXISTS orders
 (customer_id)
         REFERENCES customers
 (id)
-
 );

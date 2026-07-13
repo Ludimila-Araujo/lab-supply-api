@@ -119,7 +119,8 @@ func (r *PostgresOrderRepository) FindByID(
 func (r *PostgresOrderRepository) FindAll(
 	limit, offset int,
 ) ([]*domain.Order, error) {
-	panic("not implemented")
+
+	return []*domain.Order{}, nil
 }
 
 func (r *PostgresOrderRepository) Update(
