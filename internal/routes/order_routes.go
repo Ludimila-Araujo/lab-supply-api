@@ -15,4 +15,9 @@ func RegisterOrderRoutes(
 		"POST /orders",
 		controller.Create,
 	)
+
+	mux.HandleFunc(
+		"GET /orders",
+		controller.FindAll,
+	)
 }

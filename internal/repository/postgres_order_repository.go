@@ -87,7 +87,7 @@ func (r *PostgresOrderRepository) Create(
 			return err
 		}
 
-		_, err = tx.Exec(
+		result, err := tx.Exec(
 			updateStockQuery,
 			item.Quantity,
 			item.Product.ID,
@@ -95,6 +95,15 @@ func (r *PostgresOrderRepository) Create(
 
 		if err != nil {
 			return err
+		}
+
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
+
+		if rowsAffected == 0 {
+			return ErrProductNotFound
 		}
 	}
 

@@ -77,3 +77,10 @@ func (s *OrderService) CreateOrder(
 
 	return order, nil
 }
+
+func (s *OrderService) FindAll(
+	limit, offset int,
+) ([]*domain.Order, error) {
+
+	return s.orderRepository.FindAll(limit, offset)
+}

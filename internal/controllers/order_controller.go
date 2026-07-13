@@ -72,3 +72,20 @@ func (c *OrderController) Create(
 
 	json.NewEncoder(w).Encode(order)
 }
+
+func (c *OrderController) FindAll(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+
+	orders, err := c.orderService.FindAll(10, 0)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(orders)
+}
