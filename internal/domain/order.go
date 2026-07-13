@@ -66,3 +66,31 @@ func (o *Order) Total() float64 {
 
 	return total
 }
+
+//para pagamento do pedido:
+
+func (o *Order) Pay() error {
+
+	if o.Status != OrderStatusPending {
+		return ErrOrderInvalidStatus
+	}
+
+	o.Status = OrderStatusPaid
+	o.UpdatedAt = time.Now()
+
+	return nil
+}
+
+//para cancelamento do pedido:
+
+func (o *Order) Cancel() error {
+
+	if o.Status != OrderStatusPending {
+		return ErrOrderInvalidStatus
+	}
+
+	o.Status = OrderStatusCanceled
+	o.UpdatedAt = time.Now()
+
+	return nil
+}

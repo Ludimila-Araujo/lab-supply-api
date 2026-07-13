@@ -46,6 +46,17 @@ func main() {
 	// Controller
 	customerController := controllers.NewCustomerController(customerService)
 
+	//para pedidos:
+
+	//Repositório:
+	orderRepository := repository.NewPostgresOrderRepository(db)
+
+	//service:
+	orderService := service.NewOrderService(productRepository, customerRepository, orderRepository)
+
+	//controller:
+	orderController := controllers.NewOrderController(orderService)
+
 	//Server:
 
 	srv := server.NewServer()
@@ -59,6 +70,11 @@ func main() {
 	routes.RegisterCustomerRoutes(
 		srv.Mux(),
 		customerController,
+	)
+
+	routes.RegisterOrderRoutes(
+		srv.Mux(),
+		orderController,
 	)
 
 	log.Println("🚀 Lab Supply API running on :8080")

@@ -9,6 +9,7 @@ import (
 type OrderRepository interface {
 	Create(order *domain.Order) error
 	FindByID(id uuid.UUID) (*domain.Order, error)
+	FindAll(limit, offset int) ([]*domain.Order, error)
 	Update(order *domain.Order) error
 	Delete(id uuid.UUID) error
 }
