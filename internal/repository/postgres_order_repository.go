@@ -66,6 +66,22 @@ INNER JOIN products p
 WHERE oi.order_id = $1
 `
 
+const findAllOrdersQuery = `
+	SELECT
+		o.id,
+		o.customer_id,
+		o.status,
+		o.created_at,
+		o.updated_at
+	
+	FROM orders o
+
+	ORDER BY o.created_at DESC
+
+	LIMIT $1
+	OFFSET $2
+`
+
 func (r *PostgresOrderRepository) Create(
 	order *domain.Order,
 ) error {
@@ -247,7 +263,98 @@ func (r *PostgresOrderRepository) FindAll(
 	limit, offset int,
 ) ([]*domain.Order, error) {
 
-	return []*domain.Order{}, nil
+	rows, err := r.db.Query(
+		findAllOrdersQuery,
+		limit,
+		offset,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	orders := make([]*domain.Order, 0)
+
+	for rows.Next() {
+
+		order := &domain.Order{
+			Customer: &domain.Customer{},
+			Items:    []*domain.OrderItem{},
+		}
+
+		err := rows.Scan(
+			&order.ID,
+			&order.Customer.ID,
+			&order.Status,
+			&order.CreatedAt,
+			&order.UpdatedAt,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		// Busca os dados completos do cliente
+		customer, err := r.db.Query(
+			`
+			SELECT
+				id,
+				name,
+				cpf,
+				birth_date,
+				address,
+				email,
+				phone,
+				password_hash,
+				created_at,
+				updated_at
+			FROM customers
+			WHERE id = $1
+			`,
+			order.Customer.ID,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if customer.Next() {
+
+			err = customer.Scan(
+				&order.Customer.ID,
+				&order.Customer.Name,
+				&order.Customer.CPF,
+				&order.Customer.BirthDate,
+				&order.Customer.Address,
+				&order.Customer.Email,
+				&order.Customer.Phone,
+				&order.Customer.PasswordHash,
+				&order.Customer.CreatedAt,
+				&order.Customer.UpdatedAt,
+			)
+
+			if err != nil {
+				customer.Close()
+				return nil, err
+			}
+		}
+
+		customer.Close()
+
+		if err := r.loadOrderItems(order); err != nil {
+			return nil, err
+		}
+
+		orders = append(orders, order)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return orders, nil
 }
 
 func (r *PostgresOrderRepository) Update(
