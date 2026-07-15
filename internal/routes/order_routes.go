@@ -20,4 +20,9 @@ func RegisterOrderRoutes(
 		"GET /orders",
 		controller.FindAll,
 	)
+
+	mux.HandleFunc(
+		"GET /orders/{id}",
+		controller.FindByID,
+	)
 }

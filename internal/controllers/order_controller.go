@@ -89,3 +89,26 @@ func (c *OrderController) FindAll(
 
 	json.NewEncoder(w).Encode(orders)
 }
+
+func (c *OrderController) FindByID(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+
+	idString := r.PathValue("id")
+
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		http.Error(w, "invalid order id", http.StatusNotFound)
+		return
+	}
+
+	order, err := c.orderService.FindByID(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(order)
+}

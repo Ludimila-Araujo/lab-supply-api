@@ -78,6 +78,13 @@ func (s *OrderService) CreateOrder(
 	return order, nil
 }
 
+func (s *OrderService) FindByID(
+	id uuid.UUID,
+) (*domain.Order, error) {
+
+	return s.orderRepository.FindByID(id)
+}
+
 func (s *OrderService) FindAll(
 	limit, offset int,
 ) ([]*domain.Order, error) {

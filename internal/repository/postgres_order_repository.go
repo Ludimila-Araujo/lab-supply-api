@@ -20,6 +20,52 @@ func NewPostgresOrderRepository(
 	}
 }
 
+const findOrderByIDQuery = `
+SELECT 
+	o.id,
+	o.status,
+	o.created_at,
+	o.updated_at,
+
+	c.id,
+	c.name,
+	c.cpf,
+	c.birth_date,
+	c.address,
+	c.email,
+	c.phone,
+	c.password_hash,
+	c.created_at,
+	c.updated_at
+
+FROM orders o
+INNER JOIN customers c
+	ON c.id = o.customer_id
+WHERE o.id = $1
+`
+
+const findOrderItemsQuery = `
+SELECT
+	p.id,
+	p.name,
+	p.description,
+	p.brand,
+	p.price,
+	p.stock,
+	p.created_at,
+	p.updated_at,
+
+	oi.quantity,
+	oi.unit_price
+
+FROM order_items oi
+
+INNER JOIN products p
+	ON p.id = oi.product_id
+
+WHERE oi.order_id = $1
+`
+
 func (r *PostgresOrderRepository) Create(
 	order *domain.Order,
 ) error {
@@ -110,10 +156,91 @@ func (r *PostgresOrderRepository) Create(
 	return tx.Commit()
 }
 
+func (r *PostgresOrderRepository) loadOrderItems(
+	order *domain.Order,
+) error {
+
+	rows, err := r.db.Query(
+		findOrderItemsQuery,
+		order.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		product := &domain.Product{}
+		item := &domain.OrderItem{
+			Product: product,
+		}
+
+		err := rows.Scan(
+			&product.ID,
+			&product.Name,
+			&product.Description,
+			&product.Brand,
+			&product.Price,
+			&product.Stock,
+			&product.CreatedAt,
+			&product.UpdatedAt,
+
+			&item.Quantity,
+			&item.UnitPrice,
+		)
+
+		if err != nil {
+			return err
+		}
+
+		order.Items = append(order.Items, item)
+	}
+
+	return rows.Err()
+}
+
 func (r *PostgresOrderRepository) FindByID(
 	id uuid.UUID,
 ) (*domain.Order, error) {
-	panic("not implemented")
+
+	order := &domain.Order{
+		Customer: &domain.Customer{},
+		Items:    []*domain.OrderItem{},
+	}
+
+	err := r.db.QueryRow(
+		findOrderByIDQuery,
+		id,
+	).Scan(
+		&order.ID,
+		&order.Status,
+		&order.CreatedAt,
+		&order.UpdatedAt,
+
+		&order.Customer.ID,
+		&order.Customer.Name,
+		&order.Customer.CPF,
+		&order.Customer.BirthDate,
+		&order.Customer.Address,
+		&order.Customer.Email,
+		&order.Customer.Phone,
+		&order.Customer.PasswordHash,
+		&order.Customer.CreatedAt,
+		&order.Customer.UpdatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, ErrOrderNotFound
+	}
+
+	if err := r.loadOrderItems(order); err != nil {
+		return nil, err
+	}
+
+	return order, nil
 }
 
 func (r *PostgresOrderRepository) FindAll(
