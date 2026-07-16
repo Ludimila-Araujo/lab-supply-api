@@ -133,3 +133,24 @@ func (c *OrderController) Pay(
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (c *OrderController) Cancel(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+
+	idString := r.PathValue("id")
+
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		http.Error(w, "invalid order id", http.StatusBadRequest)
+		return
+	}
+
+	if err := c.orderService.Cancel(id); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

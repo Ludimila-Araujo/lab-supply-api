@@ -11,5 +11,6 @@ type OrderRepository interface {
 	FindByID(id uuid.UUID) (*domain.Order, error)
 	FindAll(limit, offset int) ([]*domain.Order, error)
 	Update(order *domain.Order) error
+	RestoreStock(order *domain.Order) error
 	Delete(id uuid.UUID) error
 }

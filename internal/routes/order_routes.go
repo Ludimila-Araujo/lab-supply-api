@@ -30,4 +30,9 @@ func RegisterOrderRoutes(
 		"POST /orders/{id}/pay",
 		controller.Pay,
 	)
+
+	mux.HandleFunc(
+		"POST /orders/{id}/cancel",
+		controller.Cancel,
+	)
 }

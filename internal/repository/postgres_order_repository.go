@@ -365,6 +365,14 @@ SET
 WHERE id = $3
 `
 
+const restoreStockQuery = `
+UPDATE products
+SET
+	stock = stock + $1,
+	updated_at = NOW()
+WHERE id = $2
+`
+
 func (r *PostgresOrderRepository) Update(
 	order *domain.Order,
 ) error {
@@ -387,6 +395,35 @@ func (r *PostgresOrderRepository) Update(
 
 	if rowsAffected == 0 {
 		return ErrOrderNotFound
+	}
+
+	return nil
+}
+
+func (r *PostgresOrderRepository) RestoreStock(
+	order *domain.Order,
+) error {
+
+	for _, item := range order.Items {
+
+		result, err := r.db.Exec(
+			restoreStockQuery,
+			item.Quantity,
+			item.Product.ID,
+		)
+
+		if err != nil {
+			return err
+		}
+
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
+
+		if rowsAffected == 0 {
+			return ErrProductNotFound
+		}
 	}
 
 	return nil

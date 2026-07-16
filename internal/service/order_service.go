@@ -107,3 +107,23 @@ func (s *OrderService) Pay(
 
 	return s.orderRepository.Update(order)
 }
+
+func (s *OrderService) Cancel(
+	id uuid.UUID,
+) error {
+
+	order, err := s.orderRepository.FindByID(id)
+	if err != nil {
+		return err
+	}
+
+	if err := order.Cancel(); err != nil {
+		return err
+	}
+
+	if err := s.orderRepository.RestoreStock(order); err != nil {
+		return err
+	}
+
+	return s.orderRepository.Update(order)
+}
