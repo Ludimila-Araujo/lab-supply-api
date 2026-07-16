@@ -6,7 +6,7 @@ Este projeto foi desenvolvido como desafio final do módulo 1 da disciplina de G
 
 ---
 
-# 🚀 Tecnologias utilizadas
+# Tecnologias utilizadas
 
 - Go
 - PostgreSQL
@@ -17,7 +17,7 @@ Este projeto foi desenvolvido como desafio final do módulo 1 da disciplina de G
 
 ---
 
-# 🏗 Arquitetura
+# Arquitetura
 
 O projeto foi organizado utilizando arquitetura em camadas (Layered Architecture):
 
@@ -40,7 +40,7 @@ Cada camada possui responsabilidade única:
 
 ---
 
-# 📂 Estrutura do projeto
+# Estrutura do projeto
 
 ```
 cmd/
@@ -61,40 +61,105 @@ migrations/
 
 ---
 
-# ✅ Funcionalidades implementadas
+# Funcionalidades implementadas
 
 ## Produtos
 
 - Cadastro de produtos
-- Consulta de produtos
-- Atualização de estoque
-- Persistência em PostgreSQL
+- Consulta de produtos por ID
+- Listagem de produtos
+- Atualização de produtos
+- Remoção de produtos
 
 ---
 
 ## Clientes
 
 - Cadastro de clientes
-- Consulta de clientes
+- Consulta de clientes por ID
+- Listagem de clientes
+- Atualização de clientes
+- Remoção de clientes
 - Criptografia de senha utilizando bcrypt
-- Persistência em PostgreSQL
 
 ---
 
 ## Pedidos
 
 - Criação de pedidos
-- Associação entre clientes e produtos
-- Persistência do pedido
+- Consulta de pedido por ID
+- Listagem paginada de pedidos
+- Pagamento de pedidos
+- Cancelamento de Pedidos
+- Atualizçaão automática de estoque na criação do pedido
+- Restauração automática de estoque na criação do pedido
 - Persistência dos itens do pedido
-- Atualização automática do estoque
-- Transações utilizando PostgreSQL (BEGIN / COMMIT / ROLLBACK)
 
 ---
 
-# 🔄 Fluxo de criação de pedidos
+# Regras de negócio implementadas
 
-```text
+### Produtos
+
+- Controle de estoque.
+- Não permite estoque negativo.
+
+### Clientes
+
+- CPF único.
+- Senhas armazenadas utilizando hash bcrypt.
+
+### Pedidos
+
+- Um pedido deve possuir um cliente.
+- Um pedido deve possuir ao menos um item.
+- Não permite quantidade menor ou igual a zero.
+- Não permite pedidos com estoque insuficiente.
+- Apenas pedidos com status **PENDING** podem ser pagos.
+- Apenas pedidos com status **PENDING** podem ser cancelados.
+- Cancelamento devolve automaticamente os produtos ao estoque.
+
+---
+
+# Endpoints
+
+| Método | Endpoint |
+|---------|----------|
+| POST | `/products` |
+| GET | `/products` |
+| GET | `/products/{id}` |
+| PUT | `/products/{id}` |
+| DELETE | `/products/{id}` |
+
+---
+
+### Clientes
+
+| Método | Endpoint |
+|---------|----------|
+| POST | `/customers` |
+| GET | `/customers` |
+| GET | `/customers/{id}` |
+| PUT | `/customers/{id}` |
+| DELETE | `/customers/{id}` |
+
+---
+
+### Pedidos
+
+| Método | Endpoint |
+|---------|----------|
+| POST | `/orders` |
+| GET | `/orders` |
+| GET | `/orders/{id}` |
+| POST | `/orders/{id}/pay` |
+| POST | `/orders/{id}/cancel` 
+
+---
+
+## Fluxo de criação de pedidos
+
+```
 Cliente
       │
       ▼
@@ -120,81 +185,42 @@ OrderRepository
 COMMIT
 ```
 
----
-
-# 🛡 Regras de negócio implementadas
-
-- Não permite criação de pedidos sem cliente.
-- Não permite itens sem produto.
-- Não permite quantidade menor ou igual a zero.
-- Não permite pedidos com estoque insuficiente.
-- Geração automática de UUID.
-- Controle de datas de criação e atualização.
-- Senhas armazenadas utilizando hash bcrypt.
-- Atualização automática do estoque após criação do pedido.
-
----
-
-# 📌 Endpoints implementados
-
-## Produtos
-
-- POST /products
-- GET /products
-
----
-
-## Clientes
-
-- POST /customers
-- GET /customers
-
----
-
-## Pedidos
-
-- POST /orders
-
----
-
-# 📈 Próximas evoluções (Versão 2.0)
+# Próximas evoluções (Versão 2.0)
 
 O projeto foi estruturado para permitir evolução contínua. Algumas funcionalidades planejadas para versões futuras incluem:
 
-- Implementação completa do CRUD de pedidos.
-- Paginação nas consultas.
-- Endpoint para pagamento de pedidos.
-- Endpoint para cancelamento de pedidos.
-- Listagem detalhada de pedidos por cliente.
-- Atualização parcial utilizando PATCH.
-- Testes de integração.
-- Documentação automática com Swagger/OpenAPI.
+- Autenticação JWT.
+- Middleware de autorização.
+- Swagger/OpenAPI.
 - Docker e Docker Compose.
+- Testes unitários.
+- Testes de integração.
+- Logging estruturado.
+- GitHub Actions (CI/CD).
 - Migrations automatizadas.
-- Pipeline de CI/CD utilizando GitHub Actions.
-
+- Paginação genérica.
+- Filtros nas consultas.
+- Soft Delete.
 ---
 
-# 🎯 Objetivos de aprendizagem
+## Conceitos aplicados
 
-Durante o desenvolvimento deste projeto foram aplicados conceitos como:
+Durante o desenvolvimento foram utilizados conceitos de:
 
-- Organização de projetos em Go.
-- Arquitetura em camadas.
-- Repository Pattern.
-- Injeção de Dependências.
-- Manipulação de HTTP com net/http.
-- PostgreSQL.
-- Transações.
-- Criptografia de senhas.
-- DTOs.
-- Tratamento de erros.
-- Modelagem de domínio.
-- Desenvolvimento de APIs REST.
-
+- Arquitetura em camadas
+- Repository Pattern
+- Injeção de Dependências
+- DTOs
+- APIs REST
+- UUID
+- PostgreSQL
+- Transações
+- Criptografia de senhas
+- Tratamento de erros
+- Modelagem de domínio
 ---
 
-# 👩‍💻 Desenvolvido por
+## Autora
 
 **Ludimila Araújo**
 
