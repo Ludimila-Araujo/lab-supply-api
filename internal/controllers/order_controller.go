@@ -112,3 +112,24 @@ func (c *OrderController) FindByID(
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(order)
 }
+
+func (c *OrderController) Pay(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+
+	idString := r.PathValue("id")
+
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		http.Error(w, "invalid order id", http.StatusBadRequest)
+		return
+	}
+
+	if err := c.orderService.Pay(id); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

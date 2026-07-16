@@ -357,10 +357,39 @@ func (r *PostgresOrderRepository) FindAll(
 	return orders, nil
 }
 
+const updateOrderQuery = `
+UPDATE orders
+SET
+	status = $1,
+	updated_at = $2
+WHERE id = $3
+`
+
 func (r *PostgresOrderRepository) Update(
 	order *domain.Order,
 ) error {
-	panic("not implemented")
+
+	result, err := r.db.Exec(
+		updateOrderQuery,
+		order.Status,
+		order.UpdatedAt,
+		order.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return ErrOrderNotFound
+	}
+
+	return nil
 }
 
 func (r *PostgresOrderRepository) Delete(

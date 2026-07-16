@@ -91,3 +91,19 @@ func (s *OrderService) FindAll(
 
 	return s.orderRepository.FindAll(limit, offset)
 }
+
+func (s *OrderService) Pay(
+	id uuid.UUID,
+) error {
+
+	order, err := s.orderRepository.FindByID(id)
+	if err != nil {
+		return err
+	}
+
+	if err := order.Pay(); err != nil {
+		return err
+	}
+
+	return s.orderRepository.Update(order)
+}

@@ -25,4 +25,9 @@ func RegisterOrderRoutes(
 		"GET /orders/{id}",
 		controller.FindByID,
 	)
+
+	mux.HandleFunc(
+		"POST /orders/{id}/pay",
+		controller.Pay,
+	)
 }
