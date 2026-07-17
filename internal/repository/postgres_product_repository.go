@@ -72,6 +72,20 @@ SELECT
 	`
 )
 
+const findProductByNameQuery = `
+SELECT
+	id,
+	name,
+	description,
+	brand,
+	price,
+	stock,
+	created_at,
+	updated_at
+FROM products
+WHERE name = $1
+`
+
 // PostgresProductRepository implementa o ProductRepository utilizando PostgreSQL.
 
 type PostgresProductRepository struct {
@@ -237,4 +251,37 @@ func (r *PostgresProductRepository) Delete(id uuid.UUID) error {
 	}
 
 	return nil
+}
+
+//método para busca por nome
+
+func (r *PostgresProductRepository) FindByName(
+	name string,
+) (*domain.Product, error) {
+
+	product := &domain.Product{}
+
+	err := r.db.QueryRow(
+		findProductByNameQuery,
+		name,
+	).Scan(
+		&product.ID,
+		&product.Name,
+		&product.Description,
+		&product.Brand,
+		&product.Price,
+		&product.Stock,
+		&product.CreatedAt,
+		&product.UpdatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, ErrProductNotFound
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return product, nil
 }

@@ -10,15 +10,8 @@ import (
 type ProductRepository interface {
 	Create(product *domain.Product) error
 	FindByID(id uuid.UUID) (*domain.Product, error)
+	FindByName(name string) (*domain.Product, error)
 	FindAll() ([]*domain.Product, error)
 	Update(product *domain.Product) error
 	Delete(id uuid.UUID) error
-}
-
-type CustomerRepository interface {
-	Create(*domain.Customer) error
-	FindByID(uuid.UUID) (*domain.Customer, error)
-	FindAll() ([]*domain.Customer, error)
-	Update(*domain.Customer) error
-	Delete(uuid.UUID) error
 }

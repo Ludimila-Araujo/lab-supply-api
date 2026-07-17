@@ -55,6 +55,21 @@ FROM customers
 WHERE id = $1
 `
 
+	findCustomerByCPFQuery = `
+SELECT
+	id,
+	name,
+	cpf,
+	birth_date,
+	address,
+	email,
+	phone,
+	password_hash,
+	created_at,
+	updated_at
+FROM customers
+WHERE cpf = $1
+`
 	findAllCustomersQuery = `
 SELECT
 	id,
@@ -124,6 +139,39 @@ func (r *PostgresCustomerRepository) FindByID(
 	err := r.db.QueryRow(
 		findCustomerByIDQuery,
 		id,
+	).Scan(
+		&customer.ID,
+		&customer.Name,
+		&customer.CPF,
+		&customer.BirthDate,
+		&customer.Address,
+		&customer.Email,
+		&customer.Phone,
+		&customer.PasswordHash,
+		&customer.CreatedAt,
+		&customer.UpdatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, ErrCustomerNotFound
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return customer, nil
+}
+
+func (r *PostgresCustomerRepository) FindByCPF(
+	cpf string,
+) (*domain.Customer, error) {
+
+	customer := &domain.Customer{}
+
+	err := r.db.QueryRow(
+		findCustomerByCPFQuery,
+		cpf,
 	).Scan(
 		&customer.ID,
 		&customer.Name,
