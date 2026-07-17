@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/controllers/dto"
-	"github.com/Ludimila-Araujo/lab-supply-api/internal/domain"
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/service"
 
 	"github.com/google/uuid"
@@ -44,7 +43,7 @@ func (c *ProductController) Create(
 	}
 
 	// Cria a entidade do domínio
-	product, err := domain.NewProduct(
+	product, err := c.productService.Create(
 		request.Name,
 		request.Description,
 		request.Brand,
@@ -54,12 +53,6 @@ func (c *ProductController) Create(
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Persiste no banco
-	if err := c.productService.Create(product); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

@@ -26,8 +26,32 @@ func NewProductService(
 
 //manipulação de dados - CRUD completo
 
-func (s *ProductService) Create(product *domain.Product) error {
-	return s.productRepository.Create(product)
+func (s *ProductService) Create(
+	name string,
+	description string,
+	brand string,
+	price float64,
+	stock int,
+) (*domain.Product, error) {
+
+	product, err := domain.NewProduct(
+		name,
+		description,
+		brand,
+		price,
+		stock,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.productRepository.Create(product)
+	if err != nil {
+		return nil, err
+	}
+
+	return product, nil
 }
 
 func (s *ProductService) FindByID(id uuid.UUID) (*domain.Product, error) {

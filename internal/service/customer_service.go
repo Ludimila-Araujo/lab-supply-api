@@ -82,7 +82,6 @@ func (s *CustomerService) FindByID(
 // find all
 
 func (s *CustomerService) FindAll() ([]*domain.Customer, error) {
-
 	return s.customerRepository.FindAll()
 }
 
