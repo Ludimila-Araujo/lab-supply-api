@@ -8,6 +8,18 @@ import (
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/repository"
 )
 
+const orderExistsQuery = `
+SELECT EXISTS(
+	SELECT 1
+	FROM orders o
+	INNER JOIN customers c
+		ON c.id = o.customer_id
+	WHERE c.cpf = $1
+	AND o.status = $2
+)
+
+`
+
 type seedOrder struct {
 	CustomerCPF string
 	Status      string
@@ -69,8 +81,26 @@ func SeedOrders(db *sql.DB) error {
 	orderRepository := repository.NewPostgresOrderRepository(db)
 
 	created := 0
+	skipped := 0
 
 	for _, o := range orders {
+
+		var exists bool
+
+		err := db.QueryRow(
+			orderExistsQuery,
+			o.CustomerCPF,
+			o.Status,
+		).Scan(&exists)
+
+		if err != nil {
+			return err
+		}
+
+		if exists {
+			skipped++
+			continue
+		}
 
 		customer, err := customerRepository.FindByCPF(o.CustomerCPF)
 		if err != nil {
@@ -123,8 +153,9 @@ func SeedOrders(db *sql.DB) error {
 	}
 
 	fmt.Printf(
-		"Orders: %d created\n",
+		"Orders: %d created\n | %d skipped\n",
 		created,
+		skipped,
 	)
 
 	return nil
