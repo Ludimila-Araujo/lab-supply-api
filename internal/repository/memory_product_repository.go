@@ -84,3 +84,14 @@ func (r *MemoryProductRepository) Delete(id uuid.UUID) error {
 
 	return nil
 }
+
+func (r *MemoryProductRepository) FindByName(name string) (*domain.Product, error) {
+
+	for _, product := range r.products {
+		if product.Name == name {
+			return product, nil
+		}
+	}
+
+	return nil, ErrProductNotFound
+}
