@@ -46,6 +46,31 @@ func (r *MemoryOrderRepository) FindByID(id uuid.UUID) (*domain.Order, error) {
 	return order, nil
 }
 
+//Retorno de todos os pedidos armazenados em memória
+
+func (r *MemoryOrderRepository) FindAll(
+	limit, offset int,
+) ([]*domain.Order, error) {
+
+	orders := make([]*domain.Order, 0, len(r.orders))
+
+	for _, order := range r.orders {
+		orders = append(orders, order)
+	}
+
+	if offset >= len(orders) {
+		return []*domain.Order{}, nil
+	}
+
+	end := offset + limit
+
+	if end > len(orders) {
+		end = len(orders)
+	}
+
+	return orders[offset:end], nil
+}
+
 // Atualização d eum pedido já existente
 func (r *MemoryOrderRepository) Update(order *domain.Order) error {
 
@@ -54,6 +79,19 @@ func (r *MemoryOrderRepository) Update(order *domain.Order) error {
 	}
 
 	r.orders[order.ID] = order
+
+	return nil
+}
+
+// Restauração do estoque de um pedido cancelado
+
+func (r *MemoryOrderRepository) RestoreStock(
+	order *domain.Order,
+) error {
+
+	for _, item := range order.Items {
+		item.Product.Stock += item.Quantity
+	}
 
 	return nil
 }
