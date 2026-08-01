@@ -149,3 +149,116 @@ func TestOrder_AddItem_Success(t *testing.T) {
 		t.Fatal("item was not added correctly")
 	}
 }
+
+func TestOrder_AddItem_NilItem(t *testing.T) {
+
+	// Arrange
+
+	customer, err := NewCustomer(
+		"Ludimila",
+		"52998224725",
+		mustParseDate("1995-05-20"),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	order, err := NewOrder(customer)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Act
+
+	err = order.AddItem(nil)
+
+	// Assert
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if err != ErrOrderItemRequired {
+		t.Fatalf(
+			"expected %v, got %v",
+			ErrOrderItemRequired,
+			err,
+		)
+	}
+}
+
+func TestOrder_AddItem_OrderPaid(t *testing.T) {
+
+	// Arrange
+
+	customer, err := NewCustomer(
+		"Ludimila",
+		"52998224725",
+		mustParseDate("1995-05-20"),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	order, err := NewOrder(customer)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	product, err := NewProduct(
+		"Micropipeta",
+		"Micropipeta P20",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	item, err := NewOrderItem(
+		product,
+		2,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = order.Pay()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Act
+
+	err = order.AddItem(item)
+
+	// Assert
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if err != ErrOrderCannotBeModified {
+		t.Fatalf(
+			"expected %v, got %v",
+			ErrOrderCannotBeModified,
+			err,
+		)
+	}
+}
