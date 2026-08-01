@@ -1,11 +1,13 @@
 package service
 
 import (
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/domain"
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/repository"
+	"github.com/google/uuid"
 )
 
 func TestOrderService_CreateOrder_Success(t *testing.T) {
@@ -114,5 +116,62 @@ func TestOrderService_CreateOrder_Success(t *testing.T) {
 
 	if savedOrder.ID != order.ID {
 		t.Error("saved order mismatch")
+	}
+}
+
+func TestOrderService_CreateOrder_CustomerNotFound(t *testing.T) {
+
+	productRepository := repository.NewMemoryProductRepository()
+	customerRepository := repository.NewMemoryCustomerRepository()
+	orderRepository := repository.NewMemoryOrderRepository()
+
+	orderService := NewOrderService(
+		productRepository,
+		customerRepository,
+		orderRepository,
+	)
+
+	product, err := domain.NewProduct(
+		"Micropipeta",
+		"Micropipeta P20",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := productRepository.Create(product); err != nil {
+		t.Fatal(err)
+	}
+
+	items := []CreateOrderItemRequest{
+		{
+			ProductID: product.ID,
+			Quantity:  2,
+		},
+	}
+
+	order, err := orderService.CreateOrder(
+		uuid.New(),
+		items,
+	)
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !errors.Is(err, repository.ErrCustomerNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			repository.ErrCustomerNotFound,
+			err,
+		)
+	}
+
+	if order != nil {
+		t.Fatal("expected nil order")
 	}
 }
