@@ -6,6 +6,7 @@ import (
 
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/domain"
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/repository"
+	"github.com/google/uuid"
 )
 
 func TestProductService_Create_Success(t *testing.T) {
@@ -92,5 +93,70 @@ func TestProductService_Create_InvalidName(t *testing.T) {
 			"expected repository to be empty, got %d products",
 			len(products),
 		)
+	}
+}
+
+func TestProductService_FindByID_Success(t *testing.T) {
+
+	productRepository := repository.NewMemoryProductRepository()
+
+	productService := NewProductService(productRepository)
+
+	product, err := domain.NewProduct(
+		"Micropipeta",
+		"Micropipeta P20",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = productRepository.Create(product)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	foundProduct, err := productService.FindByID(product.ID)
+
+	if err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	if foundProduct == nil {
+		t.Fatal("expected product, got nil")
+	}
+
+	if foundProduct.ID != product.ID {
+		t.Error("expected same product")
+	}
+}
+
+func TestProductService_FindByID_NotFound(t *testing.T) {
+
+	productRepository := repository.NewMemoryProductRepository()
+
+	productService := NewProductService(productRepository)
+
+	id := uuid.New()
+
+	product, err := productService.FindByID(id)
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !errors.Is(err, repository.ErrProductNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			repository.ErrProductNotFound,
+			err,
+		)
+	}
+
+	if product != nil {
+		t.Fatal("expected nil product")
 	}
 }
