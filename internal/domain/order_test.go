@@ -347,3 +347,93 @@ func TestOrder_Total(t *testing.T) {
 		)
 	}
 }
+
+func TestOrder_Pay_Success(t *testing.T) {
+
+	// Arrange
+
+	customer, err := NewCustomer(
+		"Ludimila",
+		"52998224725",
+		mustParseDate("1995-05-20"),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	order, err := NewOrder(customer)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Act
+
+	err = order.Pay()
+
+	// Assert
+
+	if err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	if order.Status != OrderStatusPaid {
+		t.Fatalf(
+			"expected %s, got %s",
+			OrderStatusPaid,
+			order.Status,
+		)
+	}
+}
+
+func TestOrder_Pay_InvalidStatus(t *testing.T) {
+
+	customer, err := NewCustomer(
+		"Ludimila",
+		"52998224725",
+		mustParseDate("1995-05-20"),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	order, err := NewOrder(customer)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = order.Pay()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Act
+
+	err = order.Pay()
+
+	// Assert
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if err != ErrOrderInvalidStatus {
+		t.Fatalf(
+			"expected %v, got %v",
+			ErrOrderInvalidStatus,
+			err,
+		)
+	}
+}
