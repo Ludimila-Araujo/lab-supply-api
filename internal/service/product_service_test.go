@@ -209,3 +209,137 @@ func TestProductService_FindAll(t *testing.T) {
 		t.Fatalf("expected 2 products, got %d", len(products))
 	}
 }
+
+func TestProductService_Update_Success(t *testing.T) {
+
+	productRepository := repository.NewMemoryProductRepository()
+
+	productService := NewProductService(productRepository)
+
+	product, err := domain.NewProduct(
+		"Micropipeta",
+		"Descrição",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := productRepository.Create(product); err != nil {
+		t.Fatal(err)
+	}
+
+	product.Price = 500
+	product.Stock = 20
+
+	if err := productService.Update(product); err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	updatedProduct, err := productRepository.FindByID(product.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if updatedProduct.Price != 500 {
+		t.Errorf("expected price 500, got %.2f", updatedProduct.Price)
+	}
+
+	if updatedProduct.Stock != 20 {
+		t.Errorf("expected stock 20, got %d", updatedProduct.Stock)
+	}
+}
+
+func TestProductService_Update_ProductNotFound(t *testing.T) {
+
+	productRepository := repository.NewMemoryProductRepository()
+
+	productService := NewProductService(productRepository)
+
+	product, err := domain.NewProduct(
+		"Micropipeta",
+		"Descrição",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = productService.Update(product)
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !errors.Is(err, repository.ErrProductNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			repository.ErrProductNotFound,
+			err,
+		)
+	}
+}
+
+func TestProductService_Delete_Success(t *testing.T) {
+
+	productRepository := repository.NewMemoryProductRepository()
+
+	productService := NewProductService(productRepository)
+
+	product, err := domain.NewProduct(
+		"Micropipeta",
+		"Descrição",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := productRepository.Create(product); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := productService.Delete(product.ID); err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	_, err = productRepository.FindByID(product.ID)
+
+	if !errors.Is(err, repository.ErrProductNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			repository.ErrProductNotFound,
+			err,
+		)
+	}
+}
+
+func TestProductService_Delete_ProductNotFound(t *testing.T) {
+
+	productRepository := repository.NewMemoryProductRepository()
+
+	productService := NewProductService(productRepository)
+
+	err := productService.Delete(uuid.New())
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !errors.Is(err, repository.ErrProductNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			repository.ErrProductNotFound,
+			err,
+		)
+	}
+}
