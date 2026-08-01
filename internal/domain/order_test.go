@@ -61,3 +61,24 @@ func TestNewOrder_Success(t *testing.T) {
 		t.Fatal("new order should start empty")
 	}
 }
+
+func TestNewOrder_NilCustomer(t *testing.T) {
+
+	order, err := NewOrder(nil)
+
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+
+	if err != ErrOrderCustomerRequired {
+		t.Fatalf(
+			"expected %v, got %v",
+			ErrOrderCustomerRequired,
+			err,
+		)
+	}
+
+	if order != nil {
+		t.Fatal("expected nil order")
+	}
+}
