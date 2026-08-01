@@ -262,3 +262,88 @@ func TestOrder_AddItem_OrderPaid(t *testing.T) {
 		)
 	}
 }
+
+func TestOrder_Total(t *testing.T) {
+
+	// Arrange
+
+	customer, err := NewCustomer(
+		"Ludimila",
+		"52998224725",
+		mustParseDate("1995-05-20"),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	order, err := NewOrder(customer)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	product1, err := NewProduct(
+		"Micropipeta",
+		"Micropipeta P20",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	product2, err := NewProduct(
+		"Ponteira",
+		"Ponteira Azul",
+		"Kasvi",
+		50,
+		20,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	item1, err := NewOrderItem(product1, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	item2, err := NewOrderItem(product2, 3)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = order.AddItem(item1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = order.AddItem(item2)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Act
+
+	total := order.Total()
+
+	// Assert
+
+	expected := 650.0 // (2 x 250) + (3 x 50)
+
+	if total != expected {
+		t.Fatalf(
+			"expected %.2f, got %.2f",
+			expected,
+			total,
+		)
+	}
+}
