@@ -160,3 +160,52 @@ func TestProductService_FindByID_NotFound(t *testing.T) {
 		t.Fatal("expected nil product")
 	}
 }
+
+func TestProductService_FindAll(t *testing.T) {
+
+	productRepository := repository.NewMemoryProductRepository()
+
+	productService := NewProductService(productRepository)
+
+	product1, err := domain.NewProduct(
+		"Micropipeta",
+		"Micropipeta P20",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	product2, err := domain.NewProduct(
+		"Centrífuga",
+		"Centrífuga Digital",
+		"Kasvi",
+		1500,
+		5,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := productRepository.Create(product1); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := productRepository.Create(product2); err != nil {
+		t.Fatal(err)
+	}
+
+	products, err := productService.FindAll()
+
+	if err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	if len(products) != 2 {
+		t.Fatalf("expected 2 products, got %d", len(products))
+	}
+}
