@@ -175,3 +175,137 @@ func TestOrderService_CreateOrder_CustomerNotFound(t *testing.T) {
 		t.Fatal("expected nil order")
 	}
 }
+
+func TestOrderService_CreateOrder_ProductNotFound(t *testing.T) {
+
+	productRepository := repository.NewMemoryProductRepository()
+	customerRepository := repository.NewMemoryCustomerRepository()
+	orderRepository := repository.NewMemoryOrderRepository()
+
+	orderService := NewOrderService(
+		productRepository,
+		customerRepository,
+		orderRepository,
+	)
+
+	customer, err := domain.NewCustomer(
+		"Ludimila",
+		"52998224725",
+		time.Date(1995, 5, 20, 0, 0, 0, 0, time.UTC),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := customerRepository.Create(customer); err != nil {
+		t.Fatal(err)
+	}
+
+	items := []CreateOrderItemRequest{
+		{
+			ProductID: uuid.New(), // Produto inexistente
+			Quantity:  2,
+		},
+	}
+
+	order, err := orderService.CreateOrder(
+		customer.ID,
+		items,
+	)
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !errors.Is(err, repository.ErrProductNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			repository.ErrProductNotFound,
+			err,
+		)
+	}
+
+	if order != nil {
+		t.Fatal("expected nil order")
+	}
+}
+
+func TestOrderService_CreateOrder_InsufficientStock(t *testing.T) {
+
+	productRepository := repository.NewMemoryProductRepository()
+	customerRepository := repository.NewMemoryCustomerRepository()
+	orderRepository := repository.NewMemoryOrderRepository()
+
+	orderService := NewOrderService(
+		productRepository,
+		customerRepository,
+		orderRepository,
+	)
+
+	customer, err := domain.NewCustomer(
+		"Ludimila",
+		"52998224725",
+		time.Date(1995, 5, 20, 0, 0, 0, 0, time.UTC),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := customerRepository.Create(customer); err != nil {
+		t.Fatal(err)
+	}
+
+	product, err := domain.NewProduct(
+		"Micropipeta",
+		"Micropipeta P20",
+		"Eppendorf",
+		250,
+		5, // estoque disponível
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := productRepository.Create(product); err != nil {
+		t.Fatal(err)
+	}
+
+	items := []CreateOrderItemRequest{
+		{
+			ProductID: product.ID,
+			Quantity:  10, // maior que o estoque
+		},
+	}
+
+	order, err := orderService.CreateOrder(
+		customer.ID,
+		items,
+	)
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !errors.Is(err, domain.ErrProductInsufficientStock) {
+		t.Fatalf(
+			"expected %v, got %v",
+			domain.ErrProductInsufficientStock,
+			err,
+		)
+	}
+
+	if order != nil {
+		t.Fatal("expected nil order")
+	}
+}
