@@ -1,12 +1,12 @@
 # 🧪 Lab Supply API
 
-API REST desenvolvida em Go para gerenciamento de uma distribuidora de produtos laboratoriais fictícia. O sistema permite o cadastro de produtos laboratoriais, clientes e pedidos, utilizando arquitetura em camadas, PostgreSQL e regras de negócio implementadas no domínio da aplicação.
+API REST desenvolvida em Go para gerenciamento de uma distribuidora de produtos laboratoriais. O sistema contempla o gerenciamento de produtos, clientes e pedidos, utilizando arquitetura em camadas, PostgreSQL e regras de negócio implementadas no domínio da aplicação
 
-Este projeto foi desenvolvido como desafio final do módulo 1 da disciplina de Go, com foco na aplicação dos principais conceitos da linguagem e de desenvolvimento Back-end.
+Este projeto foi desenvolvido como desafio final dos módulos 1 e 2 da disciplina de Go, com foco na aplicação dos principais conceitos da linguagem e de desenvolvimento Back-end.
 
 ---
 
-# Tecnologias utilizadas
+## Tecnologias utilizadas
 
 - Go
 - PostgreSQL
@@ -17,38 +17,69 @@ Este projeto foi desenvolvido como desafio final do módulo 1 da disciplina de G
 
 ---
 
-# Arquitetura
+## Arquitetura
 
-O projeto foi organizado utilizando arquitetura em camadas (Layered Architecture):
+O projeto foi estruturado utilizando Layered Architecture, separando as responsabilidades entre apresentação, regras de negócio, persistência e domínio.
 
 ```
+HTTP Request
+      │
+      ▼
 Controller
-      ↓
+      │
+      ▼
+DTO
+      │
+      ▼
 Service
-      ↓
+      │
+      ▼
 Repository
-      ↓
+      │
+      ▼
 PostgreSQL
 ```
 
-Cada camada possui responsabilidade única:
+### Responsabilidades
 
-- **Controllers**: recebem e respondem às requisições HTTP.
-- **Services**: implementam as regras de negócio.
-- **Repositories**: realizam a comunicação com o banco de dados.
-- **Domain**: contém as entidades e regras de domínio.
+**Controllers**
+
+- Recebem as requisições HTTP
+- Validam entrada
+- Convertem DTOs
+- Retornam respostas HTTP
+
+**Services**
+
+- Implementam as regras de negócio
+- Coordenam os casos de uso da aplicação
+
+**Repositories**
+
+- Responsáveis pela persistência dos dados
+- Encapsulam o acesso ao banco de dados
+
+**Domain**
+
+- Entidades
+- Validações
+- Estados
+- Regras de negócio
+- Erros centralizados
 
 ---
 
-# Estrutura do projeto
+## Estrutura do projeto
 
 ```
 cmd/
     app/
+    seed/
 
 internal/
     config/
     controllers/
+        dto/
     database/
     domain/
     repository/
@@ -59,11 +90,13 @@ internal/
 migrations/
 ```
 
+Os testes unitários permanecem junto aos respectivos pacotes seguindo a convenção da linguagem Go.
+
 ---
 
-# Funcionalidades implementadas
+## Funcionalidades implementadas
 
-## Produtos
+### Produtos
 
 - Cadastro de produtos
 - Consulta de produtos por ID
@@ -73,7 +106,7 @@ migrations/
 
 ---
 
-## Clientes
+### Clientes
 
 - Cadastro de clientes
 - Consulta de clientes por ID
@@ -84,44 +117,62 @@ migrations/
 
 ---
 
-## Pedidos
+### Pedidos
 
 - Criação de pedidos
 - Consulta de pedido por ID
 - Listagem paginada de pedidos
 - Pagamento de pedidos
-- Cancelamento de Pedidos
-- Atualizçaão automática de estoque na criação do pedido
+- Cancelamento de pedidos
+- Atualização automática de estoque na criação do pedido
 - Restauração automática de estoque na criação do pedido
 - Persistência dos itens do pedido
 
 ---
 
-# Regras de negócio implementadas
+## Regras de negócio implementadas
 
 ### Produtos
 
-- Controle de estoque.
-- Não permite estoque negativo.
-
-### Clientes
-
-- CPF único.
-- Senhas armazenadas utilizando hash bcrypt.
-
-### Pedidos
-
-- Um pedido deve possuir um cliente.
-- Um pedido deve possuir ao menos um item.
-- Não permite quantidade menor ou igual a zero.
-- Não permite pedidos com estoque insuficiente.
-- Apenas pedidos com status **PENDING** podem ser pagos.
-- Apenas pedidos com status **PENDING** podem ser cancelados.
-- Cancelamento devolve automaticamente os produtos ao estoque.
+- Nome obrigatório
+- Descrição obrigatória
+- Marca obrigatória
+- Preço maior que zero
+- Estoque não pode ser negativo
 
 ---
 
-# Endpoints
+### Clientes
+
+- Nome obrigatório
+- CPF obrigatório
+- CPF deve possuir 11 dígitos
+- Idade entre 18 e 120 anos
+- Endereço obrigatório
+- Email obrigatório
+- Telefone obrigatório
+- CPF único
+- Senha armazenada utilizando hash bcrypt
+
+---
+
+### Pedidos
+
+- Cliente obrigatório
+- Pedido deve possuir ao menos um item
+- Produto obrigatório
+- Quantidade maior que zero
+- Não permite estoque insuficiente
+- Apenas pedidos com status **PENDING** podem ser modificados
+- Apenas pedidos pendentes podem ser pagos
+- Apenas pedidos pendentes podem ser cancelados
+- Cancelamento restaura automaticamente o estoque
+
+---
+
+## Endpoints
+
+### Produtos
 
 | Método | Endpoint |
 |---------|----------|
@@ -133,7 +184,7 @@ migrations/
 
 ---
 
-### Clientes
+## Clientes
 
 | Método | Endpoint |
 |---------|----------|
@@ -153,7 +204,7 @@ migrations/
 | GET | `/orders` |
 | GET | `/orders/{id}` |
 | POST | `/orders/{id}/pay` |
-| POST | `/orders/{id}/cancel` 
+| POST | `/orders/{id}/cancel` | 
 
 ---
 
@@ -185,43 +236,70 @@ OrderRepository
 COMMIT
 ```
 
-# Próximas evoluções (Versão 2.0)
+## Testes
 
-O projeto foi estruturado para permitir evolução contínua. Algumas funcionalidades planejadas para versões futuras incluem:
+O projeto possui testes unitários para as principais regras de negócio implementadas.
 
-- Autenticação JWT.
-- Middleware de autorização.
-- Swagger/OpenAPI.
-- Docker e Docker Compose.
-- Testes unitários.
-- Testes de integração.
-- Logging estruturado.
-- GitHub Actions (CI/CD).
-- Migrations automatizadas.
-- Paginação genérica.
-- Filtros nas consultas.
-- Soft Delete.
+Atualmente o projeto possui testes unitários para:
+
+- Domain
+- ProductService
+- CustomerService
+- OrderService
+
+Os testes contemplam cenários de:
+
+- sucesso
+- validações
+- erros
+- regras de negócio
+- transições de estado dos pedidos
+
+---
+
+## Próximas evoluções (Versão 3.0)
+
+A estrutura do projeto foi planejada para permitir evolução contínua.
+
+Algumas melhorias previstas para uma versão futura:
+
+- Autenticação JWT
+- Middleware de autorização
+- Swagger/OpenAPI
+- Docker e Docker Compose
+- Ampliação da cobertura dos testes
+- Testes de integração
+- Testes End-to-End
+- Logging estruturado
+- GitHub Actions (CI/CD)
+- Migrations automatizadas
+- Paginação genérica
+- Filtros nas consultas
+- Soft Delete
+
 ---
 
 ## Conceitos aplicados
 
-Durante o desenvolvimento foram utilizados conceitos de:
-
+- Go
+- APIs REST
 - Arquitetura em camadas
 - Repository Pattern
 - Injeção de Dependências
 - DTOs
-- APIs REST
+- Modelagem de domínio
+- Validação de entidades
+- Tratamento centralizado de erros
 - UUID
 - PostgreSQL
-- Transações
-- Criptografia de senhas
-- Tratamento de erros
-- Modelagem de domínio
+- bcrypt
+- Testes unitários
+- Cobertura de código
+
 ---
 
 ## Autora
 
 **Ludimila Araújo**
 
-
+Desenvolvido como projeto final dos módulos 1 e 2 da formação em Go, com foco em arquitetura de software, APIs REST e testes unitários.
