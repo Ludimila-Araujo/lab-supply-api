@@ -189,3 +189,62 @@ func TestCustomerService_FindByID_NotFound(t *testing.T) {
 		t.Fatal("expected nil customer")
 	}
 }
+
+func TestCustomerService_FindAll(t *testing.T) {
+
+	// Arrange
+
+	customerRepository := repository.NewMemoryCustomerRepository()
+
+	customerService := NewCustomerService(customerRepository)
+
+	customer1, err := domain.NewCustomer(
+		"Ludimila",
+		"52998224725",
+		time.Date(1995, 5, 20, 0, 0, 0, 0, time.UTC),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	customer2, err := domain.NewCustomer(
+		"Maria",
+		"12345678901",
+		time.Date(1990, 10, 10, 0, 0, 0, 0, time.UTC),
+		"Rua B",
+		"maria@email.com",
+		"83888888888",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := customerRepository.Create(customer1); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := customerRepository.Create(customer2); err != nil {
+		t.Fatal(err)
+	}
+
+	// Act
+
+	customers, err := customerService.FindAll()
+
+	// Assert
+
+	if err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	if len(customers) != 2 {
+		t.Fatalf("expected 2 customers, got %d", len(customers))
+	}
+}
