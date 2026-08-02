@@ -423,94 +423,77 @@ func TestOrder_Pay(t *testing.T) {
 	}
 }
 
-func TestOrder_Cancel_Success(t *testing.T) {
+func TestOrder_Cancel(t *testing.T) {
 
-	// Arrange
-
-	customer, err := NewCustomer(
-		"Ludimila",
-		"52998224725",
-		mustParseDate("1995-05-20"),
-		"Rua A",
-		"ludi@email.com",
-		"83999999999",
-		"hash",
-	)
-
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		name           string
+		initialStatus  OrderStatus
+		expectedStatus OrderStatus
+		expectedError  error
+	}{
+		{
+			name:           "Pending to Cancelled",
+			initialStatus:  OrderStatusPending,
+			expectedStatus: OrderStatusCanceled,
+			expectedError:  nil,
+		},
+		{
+			name:           "Already Cancelled",
+			initialStatus:  OrderStatusCanceled,
+			expectedStatus: OrderStatusCanceled,
+			expectedError:  ErrOrderInvalidStatus,
+		},
 	}
 
-	order, err := NewOrder(customer)
+	for _, tt := range tests {
 
-	if err != nil {
-		t.Fatal(err)
-	}
+		t.Run(tt.name, func(t *testing.T) {
 
-	// Act
+			// Arrange
 
-	err = order.Cancel()
+			customer, err := NewCustomer(
+				"Ludimila",
+				"52998224725",
+				mustParseDate("1995-05-20"),
+				"Rua A",
+				"ludi@email.com",
+				"83999999999",
+				"hash",
+			)
 
-	// Assert
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	if err != nil {
-		t.Fatalf("expected nil error, got %v", err)
-	}
+			order, err := NewOrder(customer)
 
-	if order.Status != OrderStatusCanceled {
-		t.Fatalf(
-			"expected %s, got %s",
-			OrderStatusCanceled,
-			order.Status,
-		)
-	}
-}
+			if err != nil {
+				t.Fatal(err)
+			}
 
-func TestOrder_Cancel_InvalidStatus(t *testing.T) {
+			order.Status = tt.initialStatus
 
-	// Arrange
+			// Act
 
-	customer, err := NewCustomer(
-		"Ludimila",
-		"52998224725",
-		mustParseDate("1995-05-20"),
-		"Rua A",
-		"ludi@email.com",
-		"83999999999",
-		"hash",
-	)
+			err = order.Cancel()
 
-	if err != nil {
-		t.Fatal(err)
-	}
+			// Assert
 
-	order, err := NewOrder(customer)
+			if err != tt.expectedError {
+				t.Fatalf(
+					"expected error %v, got %v",
+					tt.expectedError,
+					err,
+				)
+			}
 
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = order.Cancel()
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Act
-
-	err = order.Cancel()
-
-	// Assert
-
-	if err == nil {
-		t.Fatal("expected error")
-	}
-
-	if err != ErrOrderInvalidStatus {
-		t.Fatalf(
-			"expected %v, got %v",
-			ErrOrderInvalidStatus,
-			err,
-		)
+			if order.Status != tt.expectedStatus {
+				t.Fatalf(
+					"expected status %v, got %v",
+					tt.expectedStatus,
+					order.Status,
+				)
+			}
+		})
 	}
 }
