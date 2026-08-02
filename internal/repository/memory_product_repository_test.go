@@ -182,3 +182,168 @@ func TestMemoryProductRepository_FindAll(t *testing.T) {
 		)
 	}
 }
+
+func TestMemoryProductRepository_Update_Success(t *testing.T) {
+
+	productRepository := NewMemoryProductRepository()
+
+	product, err := domain.NewProduct(
+		"Micropipeta",
+		"Descrição",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := productRepository.Create(product); err != nil {
+		t.Fatal(err)
+	}
+
+	// Act
+
+	product.Price = 500
+	product.Stock = 20
+
+	if err := productRepository.Update(product); err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	// Assert
+
+	updatedProduct, err := productRepository.FindByID(product.ID)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if updatedProduct.Price != 500 {
+		t.Errorf("expected price 500, got %.2f", updatedProduct.Price)
+	}
+
+	if updatedProduct.Stock != 20 {
+		t.Errorf("expected stock 20, got %d", updatedProduct.Stock)
+	}
+}
+
+func TestMemoryProductRepository_Update_NotFound(t *testing.T) {
+
+	productRepository := NewMemoryProductRepository()
+
+	product, err := domain.NewProduct(
+		"Micropipeta",
+		"Descrição",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = productRepository.Update(product)
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !errors.Is(err, domain.ErrProductNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			domain.ErrProductNotFound,
+			err,
+		)
+	}
+}
+
+func TestMemoryProductRepository_Delete_Success(t *testing.T) {
+
+	productRepository := NewMemoryProductRepository()
+
+	product, err := domain.NewProduct(
+		"Micropipeta",
+		"Descrição",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := productRepository.Create(product); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := productRepository.Delete(product.ID); err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	_, err = productRepository.FindByID(product.ID)
+
+	if !errors.Is(err, domain.ErrProductNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			domain.ErrProductNotFound,
+			err,
+		)
+	}
+}
+
+func TestMemoryProductRepository_Delete_NotFound(t *testing.T) {
+
+	productRepository := NewMemoryProductRepository()
+
+	err := productRepository.Delete(uuid.New())
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !errors.Is(err, domain.ErrProductNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			domain.ErrProductNotFound,
+			err,
+		)
+	}
+}
+
+func TestMemoryProductRepository_FindByName(t *testing.T) {
+
+	productRepository := NewMemoryProductRepository()
+
+	product, err := domain.NewProduct(
+		"Micropipeta",
+		"Descrição",
+		"Eppendorf",
+		250,
+		10,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := productRepository.Create(product); err != nil {
+		t.Fatal(err)
+	}
+
+	foundProduct, err := productRepository.FindByName("Micropipeta")
+
+	if err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	if foundProduct.Name != "Micropipeta" {
+		t.Errorf(
+			"expected 'Micropipeta', got '%s'",
+			foundProduct.Name,
+		)
+	}
+}
