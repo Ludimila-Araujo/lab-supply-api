@@ -100,7 +100,7 @@ func (r *MemoryOrderRepository) RestoreStock(
 func (r *MemoryOrderRepository) Delete(id uuid.UUID) error {
 
 	if _, exists := r.orders[id]; !exists {
-		return ErrOrderNotFound
+		return domain.ErrOrderNotFound
 	}
 
 	delete(r.orders, id)
