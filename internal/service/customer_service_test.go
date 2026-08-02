@@ -341,3 +341,69 @@ func TestCustomerService_Update_CustomerNotFound(t *testing.T) {
 		)
 	}
 }
+
+func TestCustomerService_Delete_Success(t *testing.T) {
+
+	// Arrange
+
+	customerRepository := repository.NewMemoryCustomerRepository()
+
+	customerService := NewCustomerService(customerRepository)
+
+	customer, err := domain.NewCustomer(
+		"Ludimila",
+		"52998224725",
+		time.Date(1995, 5, 20, 0, 0, 0, 0, time.UTC),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := customerRepository.Create(customer); err != nil {
+		t.Fatal(err)
+	}
+
+	// Act
+
+	if err := customerService.Delete(customer.ID); err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	// Assert
+
+	_, err = customerRepository.FindByID(customer.ID)
+
+	if !errors.Is(err, domain.ErrCustomerNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			domain.ErrCustomerNotFound,
+			err,
+		)
+	}
+}
+
+func TestCustomerService_Delete_CustomerNotFound(t *testing.T) {
+
+	customerRepository := repository.NewMemoryCustomerRepository()
+
+	customerService := NewCustomerService(customerRepository)
+
+	err := customerService.Delete(uuid.New())
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !errors.Is(err, domain.ErrCustomerNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			domain.ErrCustomerNotFound,
+			err,
+		)
+	}
+}
