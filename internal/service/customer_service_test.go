@@ -1,10 +1,13 @@
 package service
 
 import (
+	"errors"
 	"testing"
 	"time"
 
+	"github.com/Ludimila-Araujo/lab-supply-api/internal/domain"
 	"github.com/Ludimila-Araujo/lab-supply-api/internal/repository"
+	"github.com/google/uuid"
 )
 
 func TestCustomerService_Create_Success(t *testing.T) {
@@ -108,6 +111,78 @@ func TestCustomerService_Create_DuplicateCPF(t *testing.T) {
 
 	if err == nil {
 		t.Fatal("expected duplicate CPF error")
+	}
+
+	if customer != nil {
+		t.Fatal("expected nil customer")
+	}
+}
+
+func TestCustomerService_FindByID_Success(t *testing.T) {
+
+	// Arrange
+
+	customerRepository := repository.NewMemoryCustomerRepository()
+
+	customerService := NewCustomerService(customerRepository)
+
+	customer, err := domain.NewCustomer(
+		"Ludimila",
+		"52998224725",
+		time.Date(1995, 5, 20, 0, 0, 0, 0, time.UTC),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := customerRepository.Create(customer); err != nil {
+		t.Fatal(err)
+	}
+
+	// Act
+
+	foundCustomer, err := customerService.FindByID(customer.ID)
+
+	// Assert
+
+	if err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	if foundCustomer == nil {
+		t.Fatal("expected customer, got nil")
+	}
+
+	if foundCustomer.ID != customer.ID {
+		t.Error("expected same customer")
+	}
+}
+
+func TestCustomerService_FindByID_NotFound(t *testing.T) {
+
+	customerRepository := repository.NewMemoryCustomerRepository()
+
+	customerService := NewCustomerService(customerRepository)
+
+	id := uuid.New()
+
+	customer, err := customerService.FindByID(id)
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !errors.Is(err, domain.ErrCustomerNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			domain.ErrCustomerNotFound,
+			err,
+		)
 	}
 
 	if customer != nil {
