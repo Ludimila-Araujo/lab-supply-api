@@ -148,10 +148,10 @@ func TestProductService_FindByID_NotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
-	if !errors.Is(err, repository.ErrProductNotFound) {
+	if !errors.Is(err, domain.ErrProductNotFound) {
 		t.Fatalf(
 			"expected %v, got %v",
-			repository.ErrProductNotFound,
+			domain.ErrProductNotFound,
 			err,
 		)
 	}
@@ -277,10 +277,10 @@ func TestProductService_Update_ProductNotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
-	if !errors.Is(err, repository.ErrProductNotFound) {
+	if !errors.Is(err, domain.ErrProductNotFound) {
 		t.Fatalf(
 			"expected %v, got %v",
-			repository.ErrProductNotFound,
+			domain.ErrProductNotFound,
 			err,
 		)
 	}
@@ -314,10 +314,10 @@ func TestProductService_Delete_Success(t *testing.T) {
 
 	_, err = productRepository.FindByID(product.ID)
 
-	if !errors.Is(err, repository.ErrProductNotFound) {
+	if !errors.Is(err, domain.ErrProductNotFound) {
 		t.Fatalf(
 			"expected %v, got %v",
-			repository.ErrProductNotFound,
+			domain.ErrProductNotFound,
 			err,
 		)
 	}
@@ -335,10 +335,10 @@ func TestProductService_Delete_ProductNotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
-	if !errors.Is(err, repository.ErrProductNotFound) {
+	if !errors.Is(err, domain.ErrProductNotFound) {
 		t.Fatalf(
 			"expected %v, got %v",
-			repository.ErrProductNotFound,
+			domain.ErrProductNotFound,
 			err,
 		)
 	}

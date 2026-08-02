@@ -25,7 +25,7 @@ func NewMemoryOrderRepository() *MemoryOrderRepository {
 func (r *MemoryOrderRepository) Create(order *domain.Order) error {
 
 	if _, exists := r.orders[order.ID]; exists {
-		return ErrOrderAlreadyExists
+		return domain.ErrOrderAlreadyExists
 	}
 
 	r.orders[order.ID] = order
@@ -40,7 +40,7 @@ func (r *MemoryOrderRepository) FindByID(id uuid.UUID) (*domain.Order, error) {
 	order, exists := r.orders[id]
 
 	if !exists {
-		return nil, ErrOrderNotFound
+		return nil, domain.ErrOrderNotFound
 	}
 
 	return order, nil
@@ -75,7 +75,7 @@ func (r *MemoryOrderRepository) FindAll(
 func (r *MemoryOrderRepository) Update(order *domain.Order) error {
 
 	if _, exists := r.orders[order.ID]; !exists {
-		return ErrOrderNotFound
+		return domain.ErrOrderNotFound
 	}
 
 	r.orders[order.ID] = order

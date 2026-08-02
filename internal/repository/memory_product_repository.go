@@ -25,7 +25,7 @@ func NewMemoryProductRepository() *MemoryProductRepository {
 func (r *MemoryProductRepository) Create(product *domain.Product) error {
 
 	if _, exists := r.products[product.ID]; exists {
-		return ErrProductAlreadyExists
+		return domain.ErrProductAlreadyExists
 	}
 
 	r.products[product.ID] = product
@@ -40,7 +40,7 @@ func (r *MemoryProductRepository) FindByID(id uuid.UUID) (*domain.Product, error
 	product, exists := r.products[id]
 
 	if !exists {
-		return nil, ErrProductNotFound
+		return nil, domain.ErrProductNotFound
 	}
 
 	return product, nil
@@ -64,7 +64,7 @@ func (r *MemoryProductRepository) FindAll() ([]*domain.Product, error) {
 func (r *MemoryProductRepository) Update(product *domain.Product) error {
 
 	if _, exists := r.products[product.ID]; !exists {
-		return ErrProductNotFound
+		return domain.ErrProductNotFound
 	}
 
 	r.products[product.ID] = product
@@ -77,7 +77,7 @@ func (r *MemoryProductRepository) Update(product *domain.Product) error {
 func (r *MemoryProductRepository) Delete(id uuid.UUID) error {
 
 	if _, exists := r.products[id]; !exists {
-		return ErrProductNotFound
+		return domain.ErrProductNotFound
 	}
 
 	delete(r.products, id)
@@ -93,5 +93,5 @@ func (r *MemoryProductRepository) FindByName(name string) (*domain.Product, erro
 		}
 	}
 
-	return nil, ErrProductNotFound
+	return nil, domain.ErrProductNotFound
 }

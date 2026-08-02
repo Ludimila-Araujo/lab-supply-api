@@ -37,6 +37,12 @@ func (s *CustomerService) Create(
 	password string,
 ) (*domain.Customer, error) {
 
+	_, err := s.customerRepository.FindByCPF(cpf)
+
+	if err == nil {
+		return nil, domain.ErrCustomerAlreadyExists
+	}
+
 	passwordHash, err := bcrypt.GenerateFromPassword(
 		[]byte(password),
 		bcrypt.DefaultCost,

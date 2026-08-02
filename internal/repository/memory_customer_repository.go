@@ -29,7 +29,7 @@ func (r *MemoryCustomerRepository) FindByID(
 	customer, exists := r.customers[id]
 
 	if !exists {
-		return nil, ErrCustomerNotFound
+		return nil, domain.ErrCustomerNotFound
 	}
 
 	return customer, nil
@@ -46,7 +46,7 @@ func (r *MemoryCustomerRepository) FindByCPF(
 		}
 	}
 
-	return nil, ErrCustomerNotFound
+	return nil, domain.ErrCustomerNotFound
 }
 
 func (r *MemoryCustomerRepository) FindAll() ([]*domain.Customer, error) {
@@ -65,7 +65,7 @@ func (r *MemoryCustomerRepository) Update(
 ) error {
 
 	if _, exists := r.customers[customer.ID]; !exists {
-		return ErrCustomerNotFound
+		return domain.ErrCustomerNotFound
 	}
 
 	r.customers[customer.ID] = customer
@@ -78,7 +78,7 @@ func (r *MemoryCustomerRepository) Delete(
 ) error {
 
 	if _, exists := r.customers[id]; !exists {
-		return ErrCustomerNotFound
+		return domain.ErrCustomerNotFound
 	}
 
 	delete(r.customers, id)

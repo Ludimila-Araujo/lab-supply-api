@@ -13,6 +13,9 @@
 
 # Cobertura de testes
 *.out
+coverage
+domain
+coverage.html
 
 # Pasta do VS Code
 .vscode/

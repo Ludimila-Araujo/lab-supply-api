@@ -163,7 +163,7 @@ func TestOrderService_CreateOrder_CustomerNotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
-	if !errors.Is(err, repository.ErrCustomerNotFound) {
+	if !errors.Is(err, domain.ErrCustomerNotFound) {
 		t.Fatalf(
 			"expected %v, got %v",
 			repository.ErrCustomerNotFound,
@@ -222,10 +222,10 @@ func TestOrderService_CreateOrder_ProductNotFound(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
-	if !errors.Is(err, repository.ErrProductNotFound) {
+	if !errors.Is(err, domain.ErrProductNotFound) {
 		t.Fatalf(
 			"expected %v, got %v",
-			repository.ErrProductNotFound,
+			domain.ErrProductNotFound,
 			err,
 		)
 	}

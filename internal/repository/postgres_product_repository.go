@@ -145,7 +145,7 @@ func (r *PostgresProductRepository) FindByID(id uuid.UUID) (*domain.Product, err
 	)
 
 	if err == sql.ErrNoRows {
-		return nil, ErrProductNotFound
+		return nil, domain.ErrProductNotFound
 	}
 
 	if err != nil {
@@ -222,7 +222,7 @@ func (r *PostgresProductRepository) Update(product *domain.Product) error {
 	}
 
 	if rowsAffected == 0 {
-		return ErrProductNotFound
+		return domain.ErrProductNotFound
 	}
 
 	return nil
@@ -247,7 +247,7 @@ func (r *PostgresProductRepository) Delete(id uuid.UUID) error {
 	}
 
 	if rowsAffected == 0 {
-		return ErrProductNotFound
+		return domain.ErrProductNotFound
 	}
 
 	return nil
@@ -276,7 +276,7 @@ func (r *PostgresProductRepository) FindByName(
 	)
 
 	if err == sql.ErrNoRows {
-		return nil, ErrProductNotFound
+		return nil, domain.ErrProductNotFound
 	}
 
 	if err != nil {

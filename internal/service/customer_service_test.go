@@ -58,3 +58,59 @@ func TestCustomerService_Create_Success(t *testing.T) {
 		t.Fatal("saved customer does not match created customer")
 	}
 }
+
+func TestCustomerService_Create_DuplicateCPF(t *testing.T) {
+
+	// Arrange
+
+	customerRepository := repository.NewMemoryCustomerRepository()
+
+	customerService := NewCustomerService(customerRepository)
+
+	birthDate := time.Date(
+		1995,
+		5,
+		20,
+		0,
+		0,
+		0,
+		0,
+		time.UTC,
+	)
+
+	_, err := customerService.Create(
+		"Ludimila",
+		"52998224725",
+		birthDate,
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"123456",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Act
+
+	customer, err := customerService.Create(
+		"Maria",
+		"52998224725",
+		birthDate,
+		"Rua B",
+		"maria@email.com",
+		"83888888888",
+		"654321",
+	)
+
+	// Assert
+
+	if err == nil {
+		t.Fatal("expected duplicate CPF error")
+	}
+
+	if customer != nil {
+		t.Fatal("expected nil customer")
+	}
+}

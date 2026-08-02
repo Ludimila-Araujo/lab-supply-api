@@ -165,7 +165,7 @@ func (r *PostgresOrderRepository) Create(
 		}
 
 		if rowsAffected == 0 {
-			return ErrProductNotFound
+			return domain.ErrProductNotFound
 		}
 	}
 
@@ -422,7 +422,7 @@ func (r *PostgresOrderRepository) RestoreStock(
 		}
 
 		if rowsAffected == 0 {
-			return ErrProductNotFound
+			return domain.ErrProductNotFound
 		}
 	}
 
