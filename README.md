@@ -2,7 +2,7 @@
 
 API REST desenvolvida em Go para gerenciamento de uma distribuidora de produtos laboratoriais. O sistema contempla o gerenciamento de produtos, clientes e pedidos, utilizando arquitetura em camadas, PostgreSQL e regras de negócio implementadas no domínio da aplicação
 
-Este projeto foi desenvolvido como desafio final dos módulos 1 e 2 da disciplina de Go, com foco na aplicação dos principais conceitos da linguagem e de desenvolvimento Back-end.
+Este projeto foi desenvolvido como desafio final dos módulos 1 e 2 da formação em Go, com foco na aplicação dos principais conceitos da linguagem, arquitetura em camadas, desenvolvimento de APIs REST e testes unitários.
 
 ---
 
@@ -236,24 +236,24 @@ OrderRepository
 COMMIT
 ```
 
-## Testes
+O projeto possui testes unitários distribuídos entre as principais camadas da aplicação.
 
-O projeto possui testes unitários para as principais regras de negócio implementadas.
-
-Atualmente o projeto possui testes unitários para:
+Atualmente foram implementados testes para:
 
 - Domain
-- ProductService
-- CustomerService
-- OrderService
+- Services
+- Memory Repositories
 
-Os testes contemplam cenários de:
+Os testes contemplam cenários como:
 
-- sucesso
-- validações
-- erros
-- regras de negócio
+- criação de entidades
+- validações de domínio
 - transições de estado dos pedidos
+- fluxos felizes
+- fluxos de erro
+- operações de CRUD
+- paginação (`limit` e `offset`)
+- restauração automática de estoque
 
 ---
 
@@ -268,6 +268,7 @@ Algumas melhorias previstas para uma versão futura:
 - Swagger/OpenAPI
 - Docker e Docker Compose
 - Ampliação da cobertura dos testes
+- Testes de controllers utilizando httptest
 - Testes de integração
 - Testes End-to-End
 - Logging estruturado
