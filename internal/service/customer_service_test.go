@@ -248,3 +248,96 @@ func TestCustomerService_FindAll(t *testing.T) {
 		t.Fatalf("expected 2 customers, got %d", len(customers))
 	}
 }
+
+func TestCustomerService_Update_Success(t *testing.T) {
+
+	// Arrange
+
+	customerRepository := repository.NewMemoryCustomerRepository()
+
+	customerService := NewCustomerService(customerRepository)
+
+	customer, err := domain.NewCustomer(
+		"Ludimila",
+		"52998224725",
+		time.Date(1995, 5, 20, 0, 0, 0, 0, time.UTC),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := customerRepository.Create(customer); err != nil {
+		t.Fatal(err)
+	}
+
+	// Act
+
+	customer.Name = "Ludimila Araújo"
+	customer.Email = "novo@email.com"
+
+	if err := customerService.Update(customer); err != nil {
+		t.Fatalf("expected nil error, got %v", err)
+	}
+
+	// Assert
+
+	updatedCustomer, err := customerRepository.FindByID(customer.ID)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if updatedCustomer.Name != "Ludimila Araújo" {
+		t.Errorf(
+			"expected name 'Ludimila Araújo', got '%s'",
+			updatedCustomer.Name,
+		)
+	}
+
+	if updatedCustomer.Email != "novo@email.com" {
+		t.Errorf(
+			"expected email 'novo@email.com', got '%s'",
+			updatedCustomer.Email,
+		)
+	}
+}
+
+func TestCustomerService_Update_CustomerNotFound(t *testing.T) {
+
+	customerRepository := repository.NewMemoryCustomerRepository()
+
+	customerService := NewCustomerService(customerRepository)
+
+	customer, err := domain.NewCustomer(
+		"Ludimila",
+		"52998224725",
+		time.Date(1995, 5, 20, 0, 0, 0, 0, time.UTC),
+		"Rua A",
+		"ludi@email.com",
+		"83999999999",
+		"hash",
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = customerService.Update(customer)
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if !errors.Is(err, domain.ErrCustomerNotFound) {
+		t.Fatalf(
+			"expected %v, got %v",
+			domain.ErrCustomerNotFound,
+			err,
+		)
+	}
+}
